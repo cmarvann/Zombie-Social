@@ -1,6 +1,38 @@
 const { Schema, model } = require('mongoose');
 const dateFormat = require('../utils/dateFormat');
 
+
+const ReactionSchema = new Schema(
+  {
+    // set custom id to avoid confusion with parent comment's _id field
+    reactionId: {
+      type: Schema.Types.ObjectId,
+      default: () => new Types.ObjectId()
+    },
+    reactionBody: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    username: {
+      type: String,
+      required: true,
+
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      get: createdAtVal => dateFormat(createdAtVal)
+    }
+  },
+  {
+    toJSON: {
+      getters: true
+    }
+  }
+);
+
+
 const thoughtSchema = new Schema(
   {
     thoughtText: {
@@ -22,15 +54,20 @@ const thoughtSchema = new Schema(
   },
   {
     toJSON: {
+      virtuals: true,
       getters: true
-    }
+    },
+     // prevents virtuals from creating duplicate of _id as `id`
+     id: false
   }
 );
-
+// get total count of reactions and replies on retrieval
 thoughtSchema.virtual('reactionCount').get(function() {
-  return this.reactions.length;
+  return this.reactions. reduce( (total, reaction) => total + reaction.replies.length + 1, 0);
+
 });
 
 const Thought = model('Thought', thoughtSchema);
 
 module.exports = Thought;
+
