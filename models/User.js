@@ -1,8 +1,6 @@
 const { Model, DataTypes } = require('sequelize');
 
 
-
-
 // create fields/columns for User model
 User.init(
   {
@@ -32,18 +30,21 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        len: [4]
+        len: [6]
       }
-
     },
-    thoughts: {
-      id: [],
-      ref: thought
-    },
-    friends: {
-      id: [],
-      ref: user
-    },
+    thoughts: [
+      {
+        type: Schema.Types.ObjectId,
+         ref: Thought
+      }
+    ] 
+    friends: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+      }
+    ]
   },
   {
     hooks: {

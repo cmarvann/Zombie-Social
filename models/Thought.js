@@ -4,7 +4,6 @@ const dateFormat = require('../utils/dateFormat');
 
 const ReactionSchema = new Schema(
   {
-    // set custom id to avoid confusion with parent comment's _id field
     reactionId: {
       type: Schema.Types.ObjectId,
       default: () => new Types.ObjectId()
@@ -50,7 +49,8 @@ const thoughtSchema = new Schema(
       type: String,
       required: true
     },
-    reactions: [reactionSchema]
+    // reactions: [reactionSchema]
+    // friends: [friendsSchema]
   },
   {
     toJSON: {
