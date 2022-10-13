@@ -2,8 +2,6 @@ const router = require('express').Router();
 const { 
     addFriend, 
     removeFriend,
-    addReaction,
-    removeReaction
 } = require('../../controllers/friend-controller');
 
 // /api/friends/thoughtId>
@@ -15,7 +13,7 @@ router.route('/:thoughtId/:friendId')
 .delete(removeFriend);
 
 
-router.route('/:thoughtId/:friendId/:reactionId').delete(removeReaction);
+router.route('/:thoughtId/:friendId').delete(removeFriend);
 
 
 module.exports = router;

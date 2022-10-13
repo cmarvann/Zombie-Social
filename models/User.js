@@ -1,44 +1,31 @@
-const { Model, DataTypes } = require('sequelize');
+const { Schema, model } = require('mongoose');
+const bcrypt = require('bcrypt');
 
-
-// create fields/columns for User model
-User.init(
+const userSchema = new Schema(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      autoIncrement: true
-    },
     username: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: false,
+      type: String,
       required: true,
+      unique: true,
       trim: true
     },
     email: {
-      type: DataTypes.STRING,
+      type: String,
       required: true,
-      allowNull: false,
       unique: true,
-      validate: {
-        isEmail: true
-      }
+      match: [/.+@.+\..+/, 'Must match an email address!']
     },
     password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        len: [6]
-      }
+      type: String,
+      required: true,
+      minlength: 6
     },
     thoughts: [
       {
         type: Schema.Types.ObjectId,
-         ref: Thought
+        ref: 'Thought'
       }
-    ] 
+    ],
     friends: [
       {
         type: Schema.Types.ObjectId,
@@ -47,27 +34,33 @@ User.init(
     ]
   },
   {
-    hooks: {
-      // set up beforeCreate lifecycle "hook" functionality
-      async beforeCreate(newUserData) {
-        newUserData.password = await bcrypt.hash(newUserData.password, 10);
-        return newUserData;
-      },
-
-      async beforeUpdate(updatedUserData) {
-        updatedUserData.password = await bcrypt.hash(updatedUserData.password, 10);
-        return updatedUserData;
-      }
-  },
-    sequelize,
-    timestamps: false,
-    freezeTableName: true,
-    underscored: true,
-    modelName: 'user'
+    toJSON: {
+      virtuals: true
+    }
   }
 );
-user.virtual('friendCount').get(function () {
-  return this.thoughts.length;
+
+// set up pre-save middleware to create password
+userSchema.pre('save', async function(next) {
+  if (this.isNew || this.isModified('password')) {
+    const saltRounds = 10;
+    this.password = await bcrypt.hash(this.password, saltRounds);
+  }
+
+  next();
 });
+
+// compare the incoming password with the hashed password
+userSchema.methods.isCorrectPassword = async function(password) {
+  return bcrypt.compare(password, this.password);
+};
+
+userSchema.virtual('friendCount').get(function() {
+  return this.friends.length;
+});
+
+const User = model('User', userSchema);
+
 module.exports = User;
+
 

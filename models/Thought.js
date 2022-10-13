@@ -36,7 +36,7 @@ const thoughtSchema = new Schema(
   {
     thoughtText: {
       type: String,
-      required: 'You need to leave a thought!',
+      required: 'leave a thought!',
       minlength: 1,
       maxlength: 280
     },
@@ -49,7 +49,7 @@ const thoughtSchema = new Schema(
       type: String,
       required: true
     },
-    // reactions: [reactionSchema]
+    reactions: [ReactionSchema]
     // friends: [friendsSchema]
   },
   {

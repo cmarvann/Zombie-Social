@@ -15,7 +15,7 @@ const FriendSchema = new Schema({
     default: Date.now,
     get: createdAtVal => dateFormat(createdAtVal)
   },
- 
+   
   },
   {
     toJSON: {
